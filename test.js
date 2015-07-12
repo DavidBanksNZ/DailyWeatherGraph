@@ -38,7 +38,6 @@ var graph = new DailyWeatherGraph({
     width: 900,
     height: 450,
     dateFormat: '%Y-%m-%d',
-    units: 'metric',
     missingValue: -100,
     missingValueText: 'n/a',
 
