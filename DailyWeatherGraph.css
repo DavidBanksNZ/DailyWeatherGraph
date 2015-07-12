@@ -17,6 +17,7 @@ svg.daily-weather-graph rect {
 }
 .axis text {
     font-size: 11px;
+    color: #777;
 }
 
 .section-label,
