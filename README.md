@@ -15,7 +15,7 @@ var graph = new DailyWeatherGraph(config);
 The current options you **must** specify are:
 
 + ***container*** - HTML element where the chart will be drawn within.
-+ ***data*** - the data for the chart - see test.js for an example of what format this should be in.
++ ***data*** - the data for the chart - see <a href="test.js">test.js</a> for an example of what format this should be in.
 
 Additional options you can specify are:
 
