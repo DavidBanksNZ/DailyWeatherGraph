@@ -668,7 +668,7 @@ function _getWindInterpolator(config) {
         case 'mph':
            multiplier = 1/0.62137;
            break;
-        case 'ms':
+        case 'm/s':
            multiplier = 3.6;
            break;
         default:
