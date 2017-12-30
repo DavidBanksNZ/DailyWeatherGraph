@@ -1,8 +1,6 @@
-svg.daily-weather-graph {
-    font-family: Arial, Helvetica, sans-serif;
-}
 svg.daily-weather-graph line,
-svg.daily-weather-graph rect {
+svg.daily-weather-graph rect,
+svg.daily-weather-graph .axis path {
     shape-rendering: crispEdges;
 }
 
@@ -12,9 +10,7 @@ svg.daily-weather-graph rect {
     stroke: #AAA;
     stroke-width: 1px;
 }
-.axis path {
-    shape-rendering: crispEdges;
-}
+
 .axis text {
     font-size: 11px;
     fill: #777;
@@ -33,9 +29,7 @@ svg.daily-weather-graph rect {
 .graph-background {
     fill: rgb(245, 245, 245);
 }
-.plot-area-background {
-    fill: none;
-}
+.plot-area-background,
 .wind-region-background,
 .rain-region-background,
 .temperature-region-background {
@@ -64,12 +58,12 @@ svg.daily-weather-graph rect {
     stroke-width: 1px;
 }
 .temperature-high-label, .temperature-low-label {
-    font-size: 14px;
-    font-weight: bold;
+    font-size: 12px;
+    font-weight: 600;
 }
 .temperature-low-label {
-    fill: rgb(0, 50, 250);
+    fill: rgb(0, 0, 250);
 }
 .temperature-high-label {
-    fill: rgb(250, 50, 0);
+    fill: rgb(250, 0, 0);
 }

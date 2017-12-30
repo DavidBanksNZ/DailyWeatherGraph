@@ -1,6 +1,6 @@
 (function() {
 
-'use-strict';
+'use strict';
 
 window.DailyWeatherGraph = function DailyWeatherGraph(cfg) {
 
@@ -100,9 +100,9 @@ window.DailyWeatherGraph = function DailyWeatherGraph(cfg) {
         .attr('pointer-events', 'none');
 
     // The x scale. Make sure there is good spacing between points.
-    var xScale = d3.scale.ordinal()
+    var xScale = d3.scaleBand()
         .domain(_pluck(config.data, 'Date'))
-        .rangeRoundBands([0, dim.plotAreaWidth], 0.25);
+        .rangeRound([0, dim.plotAreaWidth], 0.25);
 
     _drawWindRegion(svg, xScale, config, dim, keyFunc);
     _drawTemperatureRegion(svg, xScale, config, dim, keyFunc);
@@ -111,10 +111,11 @@ window.DailyWeatherGraph = function DailyWeatherGraph(cfg) {
     // Insert day separator(s) between months. To do so, need to get the positions
     // of the two points and average them, then add half the interval width.
 
-    var dateFormat = d3.time.format(config.dateFormat);
+    var dateFormat = d3.timeFormat(config.dateFormat);
+    var dateParser = d3.timeParse(dateFormat);
 
     var daysOfMonth = config.data.map(function(d) {
-        return dateFormat.parse(d.Date).getDate();
+        return dateParser(d.Date).getDate();
     });
 
     var indexOfNewMonth = daysOfMonth.indexOf(1);
@@ -125,7 +126,7 @@ window.DailyWeatherGraph = function DailyWeatherGraph(cfg) {
 
             var prevMonthDate = data[indexOfNewMonth - 1].Date,
                 currMonthDate = data[indexOfNewMonth].Date,
-                newMonthLineX = (xScale(prevMonthDate) + xScale(currMonthDate))/2 + xScale.rangeBand()/2;
+                newMonthLineX = (xScale(prevMonthDate) + xScale(currMonthDate))/2 + xScale.bandwidth()/2;
 
             svg.append('line')
                 .attr('class', 'vertical-separator')
@@ -151,11 +152,10 @@ window.DailyWeatherGraph = function DailyWeatherGraph(cfg) {
         .style('stroke-opacity', 0);
 
     // Create the x axis, with no ticks showing.
-    var xAxis = d3.svg.axis()
+    var xAxis = d3.axisBottom()
         .scale(xScale)
-        .orient('bottom')
-        .outerTickSize(0)
-        .innerTickSize(0)
+        .tickSizeOuter(0)
+        .tickSizeInner(0)
         .tickFormat(function(x) {
             var xp = x.split('-');
             return parseInt(xp[2], 10);
@@ -245,7 +245,7 @@ function _drawRainRegion(svg, xScale, config, dim, keyFunc) {
     });
 
     // The rain scale. Leave space at top for labels.
-    var rainScale = d3.scale.linear()
+    var rainScale = d3.scaleLinear()
         .range([0, dim.rainRegionHeight - 30])
         .domain([0, Math.max(lowestRainScaleMax, d3.max(rainTotals))])
         .clamp(true);
@@ -287,7 +287,7 @@ function _drawRainRegion(svg, xScale, config, dim, keyFunc) {
                 0 :
                 rainScale(d.Rainfall));
         })
-        .attr('width', xScale.rangeBand())
+        .attr('width', xScale.bandwidth())
         .attr('height', function(d) {
             return (d.Rainfall === config.missingValue ?
                 0 :
@@ -307,7 +307,7 @@ function _drawRainRegion(svg, xScale, config, dim, keyFunc) {
                 'rain-label');
         })
         .attr('text-anchor', 'middle')
-        .attr('x', function(d) {return xScale(d.Date) + xScale.rangeBand()/2;})
+        .attr('x', function(d) {return xScale(d.Date) + xScale.bandwidth()/2;})
         .attr('y', function(d) {
             var r = (d.Rainfall === config.missingValue ? 0 : d.Rainfall);
             return dim.plotAreaHeight - rainScale(r) - 8;
@@ -367,7 +367,7 @@ function _drawRainRegion(svg, xScale, config, dim, keyFunc) {
 function _drawTemperatureRegion(svg, xScale, config, dim, keyFunc) {
 
     // The temperature scale
-    var tempScale = d3.scale.linear()
+    var tempScale = d3.scaleLinear()
         .range([dim.plotAreaHeight - dim.rainRegionHeight - dim.regionSpacing,
                 dim.windRegionHeight + dim.regionSpacing]);
 
@@ -391,12 +391,12 @@ function _drawTemperatureRegion(svg, xScale, config, dim, keyFunc) {
     tempScale.domain(tempScaleLimits);
 
     // D3 line function for calculating temperature path coordinates
-    var lowTemperatureLine = d3.svg.line()
-        .x(function(d) { return xScale(d.Date) + xScale.rangeBand()/2; })
+    var lowTemperatureLine = d3.line()
+        .x(function(d) { return xScale(d.Date) + xScale.bandwidth()/2; })
         .y(function(d) { return tempScale(d.LowTemperature); });
 
-    var highTemperatureLine = d3.svg.line()
-        .x(function(d) { return xScale(d.Date) + xScale.rangeBand()/2; })
+    var highTemperatureLine = d3.line()
+        .x(function(d) { return xScale(d.Date) + xScale.bandwidth()/2; })
         .y(function(d) { return tempScale(d.HighTemperature); });
 
     lowTemperatureLine.defined(function(d) {
@@ -435,7 +435,7 @@ function _drawTemperatureRegion(svg, xScale, config, dim, keyFunc) {
         .enter()
         .append('text')
         .attr('class', 'temperature-high-label')
-        .attr('x', function(d) { return xScale(d.Date) + xScale.rangeBand()/2; })
+        .attr('x', function(d) { return xScale(d.Date) + xScale.bandwidth()/2; })
         .attr('y', function(d) { return tempScale(d.HighTemperature); })
         .attr('dy', '0.35em')
         .attr('text-anchor', 'middle')
@@ -450,7 +450,7 @@ function _drawTemperatureRegion(svg, xScale, config, dim, keyFunc) {
         .enter()
         .append('text')
         .attr('class', 'temperature-low-label')
-        .attr('x', function(d) { return xScale(d.Date) + xScale.rangeBand()/2; })
+        .attr('x', function(d) { return xScale(d.Date) + xScale.bandwidth()/2; })
         .attr('y', function(d) { return tempScale(d.LowTemperature); })
         .attr('dy', '0.35em')
         .attr('text-anchor', 'middle')
@@ -509,7 +509,7 @@ function _drawWindRegion(svg, xScale, config, dim, keyFunc) {
         .attr('transform', function(d) {
             if (d.HighWindGustBearing === config.missingValue)
                 return '';
-            var trans_x = (xScale(d.Date) + xScale.rangeBand()/2);
+            var trans_x = (xScale(d.Date) + xScale.bandwidth()/2);
             return 'translate(' + (trans_x - dim.windSize/2) + ',' + y + ')';
         })
         .style('fill', function(d) {
@@ -534,7 +534,7 @@ function _drawWindRegion(svg, xScale, config, dim, keyFunc) {
         .attr('transform', function(d) {
             if (d.HighWindGustBearing === config.missingValue)
                 return '';
-            var trans_x = (xScale(d.Date) + xScale.rangeBand()/2),
+            var trans_x = (xScale(d.Date) + xScale.bandwidth()/2),
                 rotate = 45 * Math.round(d.HighWindGustBearing/45);
             return 'translate(' + (trans_x - dim.windSize/2) + ',35) rotate(' +
                 rotate + ' ' + dim.windSize/2 + ' ' + dim.windSize/2 + ')';
@@ -560,7 +560,7 @@ function _drawWindRegion(svg, xScale, config, dim, keyFunc) {
                 'na-label' :
                 'wind-gust-label');
         })
-        .attr('x', function(d) { return xScale(d.Date) + xScale.rangeBand()/2; })
+        .attr('x', function(d) { return xScale(d.Date) + xScale.bandwidth()/2; })
         .attr('y', y + dim.windSize/2)
         .attr('dy', '0.35em')
         .attr('text-anchor', 'middle')
@@ -575,7 +575,7 @@ function _drawWindRegion(svg, xScale, config, dim, keyFunc) {
         .enter()
         .append('text')
         .attr('class', 'wind-direction-label')
-        .attr('x', function(d) { return xScale(d.Date) + xScale.rangeBand()/2; })
+        .attr('x', function(d) { return xScale(d.Date) + xScale.bandwidth()/2; })
         .attr('y', y)
         .attr('text-anchor', 'middle')
         .text(function(d) {

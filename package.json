@@ -1,0 +1,20 @@
+{
+  "name": "daily-weather-graph-d3",
+  "version": "1.0.0",
+  "description": "Library for creating a daily weather chart using D3",
+  "main": "DailyWeatherGraph.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DavidBanksNZ/DailyWeatherGraph.git"
+  },
+  "author": "David Banks <davidgbanks@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/DavidBanksNZ/DailyWeatherGraph/issues"
+  },
+  "homepage": "https://github.com/DavidBanksNZ/DailyWeatherGraph#readme",
+  "dependencies": {
+    "d3": "^4.12.2"
+  }
+}
