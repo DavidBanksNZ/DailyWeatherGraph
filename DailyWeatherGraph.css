@@ -1,75 +1,69 @@
-svg.daily-weather-graph {
-    font-family: Arial, Helvetica, sans-serif;
-}
-svg.daily-weather-graph line,
-svg.daily-weather-graph rect {
+.dwg-root line,
+.dwg-root rect,
+.dwg-root .dwg-axis path {
     shape-rendering: crispEdges;
 }
 
-.region-separator,
-.vertical-separator,
-.axis line, .axis path {
+.dwg-region-separator,
+.dwg-vertical-separator,
+.dwg-axis line, .axis path {
     stroke: #AAA;
     stroke-width: 1px;
 }
-.axis path {
-    shape-rendering: crispEdges;
-}
-.axis text {
+
+.dwg-axis text {
     font-size: 11px;
     fill: #777;
 }
 
-.section-label,
-.statistic-label {
+.dwg-section-label,
+.dwg-statistic-label {
     fill: #333;
     font-size: 12px;
 }
-.missing-label {
+.dwg-missing-label {
     fill: #777;
     font-size: 11px;
 }
 
-.graph-background {
+.dwg-graph-background {
     fill: rgb(245, 245, 245);
 }
-.plot-area-background {
-    fill: none;
-}
-.wind-region-background,
-.rain-region-background,
-.temperature-region-background {
+.dwg-plot-area-background,
+.dwg-wind-region-background,
+.dwg-rain-region-background,
+.dwg-temperature-region-background {
     fill: none;
 }
 
-.rain-bar {
+.dwg-rain-bar {
     stroke-width: 1px;
 }
-.rain-label {
+.dwg-rain-label {
     font-size: 11px;
 }
 
-.wind-gust-label {
+.dwg-wind-gust-label {
     fill: #FFFFFF;
     font-size: 11px;
 }
-.wind-direction-label {
+.dwg-wind-direction-label {
     fill: #777777;
     font-size: 11px;
 }
 
-.temperature-low-path, .temperature-high-path {
+.dwg-temperature-low-path, .dwg-temperature-high-path {
     fill: none;
     stroke: #CCC;
     stroke-width: 1px;
 }
-.temperature-high-label, .temperature-low-label {
-    font-size: 14px;
-    font-weight: bold;
+.dwg-temperature-high-label, .dwg-temperature-low-label {
+    font-size: 12px;
+    font-weight: 600;
 }
-.temperature-low-label {
-    fill: rgb(0, 50, 250);
+.dwg-temperature-low-label {
+    fill: rgb(0, 0, 250);
 }
-.temperature-high-label {
-    fill: rgb(250, 50, 0);
+.dwg-temperature-high-label {
+    fill: rgb(250, 0, 0);
 }
