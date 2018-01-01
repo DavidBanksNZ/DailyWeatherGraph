@@ -34,8 +34,8 @@ var data = [
 var graph = new DailyWeatherGraph({
     data: data,
     container: d3.select('#test'),
-    width: 900,
-    height: 450,
+    width: 880,
+    height: 440,
     dateFormat: '%Y-%m-%d',
     missingValue: -100,
     missingValueText: 'n/a'
