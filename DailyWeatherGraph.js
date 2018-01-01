@@ -60,11 +60,11 @@ window.DailyWeatherGraph = function DailyWeatherGraph(cfg) {
     var svgEl = config.container.append('svg')
         .attr('width', config.width)
         .attr('height', config.height)
-        .attr('class', 'daily-weather-graph');
+        .attr('class',  _className('root'));
 
     // Background rect for whole SVG area
     svgEl.append('rect')
-        .attr('class', 'graph-background')
+        .attr('class',  _className('graph-background'))
         .attr('x', 0)
         .attr('y', 0)
         .attr('width', config.width)
@@ -72,7 +72,7 @@ window.DailyWeatherGraph = function DailyWeatherGraph(cfg) {
 
     // Background rect for whole plot area
     var plotArea = svgEl.append('rect')
-        .attr('class', 'plot-area-background')
+        .attr('class',  _className('plot-area-background'))
         .attr('x', dim.marginLeft)
         .attr('y', dim.marginTop)
         .attr('width', dim.plotAreaWidth)
@@ -90,7 +90,7 @@ window.DailyWeatherGraph = function DailyWeatherGraph(cfg) {
 
     // Get the SVG context we will be drawing in (simply applies the margins).
     var svg = svgEl.append('g')
-        .attr('class', 'plot-area')
+        .attr('class', _className('plot-area'))
         .attr('transform', 'translate(' + dim.marginLeft + ',' + dim.marginTop + ')')
         .attr('pointer-events', 'none');
 
@@ -124,7 +124,7 @@ window.DailyWeatherGraph = function DailyWeatherGraph(cfg) {
                 newMonthLineX = (xScale(prevMonthDate) + xScale(currMonthDate)) / 2 + xScale.bandwidth() / 2;
 
             svg.append('line')
-                .attr('class', 'vertical-separator')
+                .attr('class', _className('vertical-separator'))
                 .attr('x1', newMonthLineX)
                 .attr('x2', newMonthLineX)
                 .attr('y1', dim.marginTop)
@@ -151,14 +151,14 @@ window.DailyWeatherGraph = function DailyWeatherGraph(cfg) {
         .scale(xScale)
         .tickSizeOuter(0)
         .tickSizeInner(0)
-        .tickFormat(function(x) {
-            var xp = x.split('-');
-            return parseInt(xp[2], 10);
+        .tickFormat(function(date) {
+            var dateParts = date.split('-');
+            return parseInt(dateParts[2], 10);
         });
 
     // Draw the x axis and labels
     svg.append('g')
-        .attr('class', 'axis x-axis')
+        .attr('class', _className('axis', 'x-axis'))
         .attr('transform', 'translate(0,' + dim.plotAreaHeight + ')')
         .call(xAxis)
         .selectAll('text')
@@ -241,24 +241,24 @@ function _drawRainRegion(svg, xScale, config, dim, keyFunc) {
         .clamp(true);
 
     var rainInterpolator = _getRainInterpolator(config),
-        rainRegion = svg.append('g').attr('class', 'rain-region');
+        rainRegion = svg.append('g').attr('class', _className('rain-region'));
 
     rainRegion.append('rect')
-        .attr('class', 'rain-region-background')
+        .attr('class',  _className('rain-region-background'))
         .attr('x', 0)
         .attr('y', dim.plotAreaHeight - dim.rainRegionHeight - dim.regionSpacing / 2)
         .attr('width', dim.plotAreaWidth)
         .attr('height', dim.rainRegionHeight + dim.regionSpacing / 2);
 
-    var rainBars = rainRegion.append('g').attr('class', 'rain-bars'),
-        rainLabels = rainRegion.append('g').attr('class', 'rain-labels');
+    var rainBars = rainRegion.append('g').attr('class',  _className('rain-bars')),
+        rainLabels = rainRegion.append('g').attr('class',  _className('rain-labels'));
 
     // Insert the rainfall bars
     rainBars.selectAll('rect.rain-bar')
         .data(config.data, keyFunc)
         .enter()
         .append('rect')
-        .attr('class', 'rain-bar')
+        .attr('class',  _className('rain-bar'))
         .style('fill', function(d) {
             return (d.Rainfall === 0 || d.Rainfall === config.missingValue ?
                 'none' :
@@ -292,8 +292,8 @@ function _drawRainRegion(svg, xScale, config, dim, keyFunc) {
         .append('text')
         .attr('class', function(d) {
             return (d.Rainfall === config.missingValue ?
-                'missing-label' :
-                'rain-label');
+				_className('missing-label') :
+				_className('rain-label'));
         })
         .attr('text-anchor', 'middle')
         .attr('x', function(d) {return xScale(d.Date) + xScale.bandwidth() / 2;})
@@ -320,7 +320,7 @@ function _drawRainRegion(svg, xScale, config, dim, keyFunc) {
 
     // Draw rainfall label in top left of rain region
     rainRegion.append('text')
-        .attr('class', 'section-label')
+        .attr('class',  _className('section-label'))
         .attr('x', 5)
         .attr('y', dim.plotAreaHeight - dim.rainRegionHeight - dim.regionSpacing / 2)
         .attr('dy', '1.3em')
@@ -328,7 +328,7 @@ function _drawRainRegion(svg, xScale, config, dim, keyFunc) {
 
     // Draw rain total label at top-right of rain region
     rainRegion.append('text')
-        .attr('class', 'statistic-label')
+        .attr('class',  _className('statistic-label'))
         .attr('x', dim.plotAreaWidth - 5)
         .attr('y', dim.plotAreaHeight - dim.rainRegionHeight - dim.regionSpacing / 2)
         .attr('text-anchor', 'end')
@@ -337,7 +337,7 @@ function _drawRainRegion(svg, xScale, config, dim, keyFunc) {
 
     // Add line to separate rain region from temperature region
     rainRegion.append('line')
-        .attr('class', 'region-separator')
+        .attr('class',  _className('region-separator'))
         .attr('transform', 'translate(0,' + (dim.plotAreaHeight - dim.rainRegionHeight - dim.regionSpacing / 2) + ')')
         .attr('x1', 0)
         .attr('x2', dim.plotAreaWidth)
@@ -391,10 +391,10 @@ function _drawTemperatureRegion(svg, xScale, config, dim, keyFunc) {
         return d.HighTemperature !== config.missingValue;
     });
 
-    var tempRegion = svg.append('g').attr('class', 'temperature-region');
+    var tempRegion = svg.append('g').attr('class',  _className('temperature-region'));
 
     tempRegion.append('rect')
-        .attr('class', 'temperature-region-background')
+        .attr('class',  _className('temperature-region-background'))
         .attr('x', 0)
         .attr('y', dim.windRegionHeight + dim.regionSpacing / 2)
         .attr('width', dim.plotAreaWidth)
@@ -402,15 +402,15 @@ function _drawTemperatureRegion(svg, xScale, config, dim, keyFunc) {
 
     // Draw the temperature lines
     tempRegion.append('path')
-        .attr('class', 'temperature-low-path')
+        .attr('class',  _className('temperature-low-path'))
         .attr('d', lowTemperatureLine(config.data));
 
     tempRegion.append('path')
-        .attr('class', 'temperature-high-path')
+        .attr('class',  _className('temperature-high-path'))
         .attr('d', highTemperatureLine(config.data));
 
-    var tempHighLabels = tempRegion.append('g').attr('class', 'temperature-high-labels'),
-        tempLowLabels = tempRegion.append('g').attr('class', 'temperature-low-labels');
+    var tempHighLabels = tempRegion.append('g').attr('class',  _className('temperature-high-labels')),
+        tempLowLabels = tempRegion.append('g').attr('class',  _className('temperature-low-labels'));
 
     // Draw the high temperature labels
     tempHighLabels.append('g')
@@ -418,7 +418,7 @@ function _drawTemperatureRegion(svg, xScale, config, dim, keyFunc) {
         .data(config.data, keyFunc)
         .enter()
         .append('text')
-        .attr('class', 'temperature-high-label')
+        .attr('class',  _className('temperature-high-label'))
         .attr('x', function(d) { return xScale(d.Date) + xScale.bandwidth() / 2; })
         .attr('y', function(d) { return tempScale(d.HighTemperature); })
         .attr('dy', '0.35em')
@@ -433,7 +433,7 @@ function _drawTemperatureRegion(svg, xScale, config, dim, keyFunc) {
         .data(config.data, keyFunc)
         .enter()
         .append('text')
-        .attr('class', 'temperature-low-label')
+        .attr('class',  _className('temperature-low-label'))
         .attr('x', function(d) { return xScale(d.Date) + xScale.bandwidth() / 2; })
         .attr('y', function(d) { return tempScale(d.LowTemperature); })
         .attr('dy', '0.35em')
@@ -444,7 +444,7 @@ function _drawTemperatureRegion(svg, xScale, config, dim, keyFunc) {
 
     // Draw the temperature region and wind region separator
     tempRegion.append('line')
-        .attr('class', 'region-separator')
+        .attr('class',  _className('region-separator'))
         .attr('transform', 'translate(0,' + (dim.windRegionHeight + dim.regionSpacing / 2) + ')')
         .attr('x1', 0)
         .attr('x2', dim.plotAreaWidth)
@@ -453,7 +453,7 @@ function _drawTemperatureRegion(svg, xScale, config, dim, keyFunc) {
 
     // Draw temperature label in top left of temperature region
     tempRegion.append('text')
-        .attr('class', 'section-label')
+        .attr('class',  _className('section-label'))
         .attr('x', 5)
         .attr('y', dim.windRegionHeight + dim.regionSpacing / 2)
         .attr('dy', '1.3em')
@@ -471,19 +471,19 @@ function _drawWindRegion(svg, xScale, config, dim, keyFunc) {
     var windInterpolator = _getWindInterpolator(config);
     var y = 35;
 
-    var windRegion = svg.append('g').attr('class', 'wind-region');
+    var windRegion = svg.append('g').attr('class',  _className('wind-region'));
 
     windRegion.append('rect')
-        .attr('class', 'wind-region-background')
+        .attr('class',  _className('wind-region-background'))
         .attr('x', 0)
         .attr('y', 0)
         .attr('width', dim.plotAreaWidth)
         .attr('height', dim.windRegionHeight + dim.regionSpacing / 2);
 
-    var windIcons = windRegion.append('g').attr('class', 'wind-icons'),
-        windArrows = windRegion.append('g').attr('class', 'wind-arrows'),
-        windGustLabels = windRegion.append('g').attr('class', 'wind-gust-labels'),
-        windDirLabels = windRegion.append('g').attr('class', 'wind-direction-labels');
+    var windIcons = windRegion.append('g').attr('class',  _className('wind-icons')),
+        windArrows = windRegion.append('g').attr('class',  _className('wind-arrows')),
+        windGustLabels = windRegion.append('g').attr('class',  _className('wind-gust-labels')),
+        windDirLabels = windRegion.append('g').attr('class',  _className('wind-direction-labels'));
 
     windIcons.selectAll('wind-icon')
         .data(config.data, keyFunc)
@@ -541,8 +541,8 @@ function _drawWindRegion(svg, xScale, config, dim, keyFunc) {
         .append('text')
         .attr('class', function(d) {
             return (d.HighWindGust === config.missingValue ?
-                'na-label' :
-                'wind-gust-label');
+				_className('na-label') :
+				_className('wind-gust-label'));
         })
         .attr('x', function(d) { return xScale(d.Date) + xScale.bandwidth() / 2; })
         .attr('y', y + dim.windSize / 2)
@@ -558,7 +558,7 @@ function _drawWindRegion(svg, xScale, config, dim, keyFunc) {
         .data(config.data, keyFunc)
         .enter()
         .append('text')
-        .attr('class', 'wind-direction-label')
+        .attr('class',  _className('wind-direction-label'))
         .attr('x', function(d) { return xScale(d.Date) + xScale.bandwidth() / 2; })
         .attr('y', y)
         .attr('text-anchor', 'middle')
@@ -570,7 +570,7 @@ function _drawWindRegion(svg, xScale, config, dim, keyFunc) {
 
     // Draw wind label in top left of wind region
     windRegion.append('text')
-        .attr('class', 'section-label')
+        .attr('class',  _className('section-label'))
         .attr('x', 5)
         .attr('y', 5)
         .attr('dy', '0.8em')
@@ -581,6 +581,10 @@ function _drawWindRegion(svg, xScale, config, dim, keyFunc) {
 
 
 /*---------------------------- Utility functions ----------------------------*/
+
+function _className(className) {
+    return 'dwg-' + className;
+}
 
 function _hasOwn(obj, prop) {
     return Object.prototype.hasOwnProperty.call(obj, prop);
