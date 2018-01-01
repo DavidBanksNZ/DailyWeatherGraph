@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "Library for creating a daily weather chart using D3",
   "main": "DailyWeatherGraph.js",
-  "scripts": {},
+  "scripts": {
+    "uglify": "uglifyjs daily-weather-graph.js --compress --mangle --output daily-weather-graph.min.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/DavidBanksNZ/DailyWeatherGraph.git"
@@ -16,5 +18,8 @@
   "homepage": "https://github.com/DavidBanksNZ/DailyWeatherGraph#readme",
   "dependencies": {
     "d3": "^4.12.2"
+  },
+  "devDependencies": {
+    "uglify-js": "^3.3.4"
   }
 }
