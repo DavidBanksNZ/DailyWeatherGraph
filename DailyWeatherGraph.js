@@ -5,17 +5,14 @@
 window.DailyWeatherGraph = function DailyWeatherGraph(cfg) {
 
     var defaults = {
-
         width: 800,
         height: 375,
         dateFormat: '%Y-%m-%d',
         missingValue: null,
         missingValueText: 'n/a',
-
         temperatureUnit: 'C',
         rainfallUnit: 'mm',
         windUnit: 'km/h'
-
     };
 
     // Clone config object
@@ -31,7 +28,6 @@ window.DailyWeatherGraph = function DailyWeatherGraph(cfg) {
 
     // Dimension settings: widths, heights, margins, etc.
     var dim = {
-
         marginTop: 10,
         marginRight: 10,
         marginBottom: 30,
@@ -44,7 +40,6 @@ window.DailyWeatherGraph = function DailyWeatherGraph(cfg) {
 
         windSize: 50,
         windCircleRadius: 12
-
     };
 
     // Calculate dimensions of actual plot area
@@ -199,7 +194,6 @@ window.DailyWeatherGraph = function DailyWeatherGraph(cfg) {
 
 
 
-
 function _createWindIndicatorDefs(defs, dim) {
 
     var windSymbol = defs.append('g')
@@ -212,16 +206,15 @@ function _createWindIndicatorDefs(defs, dim) {
         .attr('stroke-width', '1.3px')
         .attr('r', dim.windCircleRadius);
 
-    var indicator = defs.append('g')
-        .attr('id', 'daily-weather-graph-wind-indicator');
+    var indicator_y0 = dim.windSize / 2 - dim.windCircleRadius + 4,
+        indicator_length = 8,
+        indicator_y1 = indicator_y0 - indicator_length,
+        indicator_x0 = dim.windSize / 2 - indicator_length / 2,
+        indicator_x1 = dim.windSize / 2 + indicator_length / 2;
 
-    var indicator_y0 = dim.windSize / 2 - dim.windCircleRadius + 4;
-    var indicator_length = 8;
-    var indicator_y1 = indicator_y0 - indicator_length;
-    var indicator_x0 = dim.windSize / 2 - indicator_length / 2;
-    var indicator_x1 = dim.windSize / 2 + indicator_length / 2;
-
-    indicator.append('path')
+    defs.append('g')
+        .attr('id', 'daily-weather-graph-wind-indicator')
+        .append('path')
         .attr('d', 'M' + indicator_x0 + ',' + indicator_y1 +
             ' L' + indicator_x1 + ',' + indicator_y1 +
             ' L' + dim.windSize / 2 + ',' + indicator_y0 +
@@ -233,12 +226,8 @@ function _createWindIndicatorDefs(defs, dim) {
 
 function _drawRainRegion(svg, xScale, config, dim, keyFunc) {
 
-    var lowestRainScaleMax = 10;
-    var rainDecimals = (config.rainUnit === 'inches' ? 2 : 1);
-
-    if (config.rainUnit === 'inches') {
-        lowestRainScaleMax = lowestRainScaleMax / 25.4;
-    }
+    var lowestRainScaleMax = config.rainUnit === 'inches' ? 0.4 : 10,
+        rainDecimals = (config.rainUnit === 'inches' ? 2 : 1);
 
     // Filter any NA values
     var rainTotals = _mapVariable(config.data, 'Rainfall').filter(function(r) {
@@ -251,9 +240,8 @@ function _drawRainRegion(svg, xScale, config, dim, keyFunc) {
         .domain([0, Math.max(lowestRainScaleMax, d3.max(rainTotals))])
         .clamp(true);
 
-    var rainInterpolator = _getRainInterpolator(config);
-
-    var rainRegion = svg.append('g').attr('class', 'rain-region');
+    var rainInterpolator = _getRainInterpolator(config),
+        rainRegion = svg.append('g').attr('class', 'rain-region');
 
     rainRegion.append('rect')
         .attr('class', 'rain-region-background')
@@ -327,10 +315,7 @@ function _drawRainRegion(svg, xScale, config, dim, keyFunc) {
                 }
                 return label;
             }
-            if (d.Rainfall === 0) {
-                return '.';
-            }
-            return config.missingValueText;
+            return d.Rainfall === 0 ? '.' : config.missingValueText;
         });
 
     // Draw rainfall label in top left of rain region
@@ -363,7 +348,6 @@ function _drawRainRegion(svg, xScale, config, dim, keyFunc) {
 
 
 
-
 function _drawTemperatureRegion(svg, xScale, config, dim, keyFunc) {
 
     // The temperature scale
@@ -372,15 +356,15 @@ function _drawTemperatureRegion(svg, xScale, config, dim, keyFunc) {
                 dim.windRegionHeight + dim.regionSpacing]);
 
     // Calculate the range of the temperature data.
-    var highTemps = _mapVariable(config.data, 'HighTemperature');
-    var lowTemps = _mapVariable(config.data, 'LowTemperature');
+    var highTemps = _mapVariable(config.data, 'HighTemperature'),
+        lowTemps = _mapVariable(config.data, 'LowTemperature');
 
     var validTemps = highTemps.concat(lowTemps).filter(function(t) {
         return t !== config.missingValue;
     });
 
-    var tempScaleLimits = d3.extent(validTemps);
-    var tempScaleRange = tempScaleLimits[1] - tempScaleLimits[0];
+    var tempScaleLimits = d3.extent(validTemps),
+        tempScaleRange = tempScaleLimits[1] - tempScaleLimits[0];
 
     // Pad out the temperature axis limits, more so at the top.
     // If there is no variation throughout the period, use +/- 1 degree
@@ -596,10 +580,6 @@ function _drawWindRegion(svg, xScale, config, dim, keyFunc) {
 
 
 
-
-
-
-
 /*---------------------------- Utility functions ----------------------------*/
 
 function _hasOwn(obj, prop) {
@@ -632,18 +612,11 @@ function _getWindDirection(bearing) {
 
 function _getRainInterpolator(config) {
 
-    var maxAt = 50,
-        minAt = 0;
-
-    if (config.rainUnit === 'inches') {
-        maxAt = maxAt / 25.4;
-    }
-
-    var interpolator = d3.interpolateRgb('#4BA7EB', '#0023AD');
+    var maxAt = config.rainUnit === 'inches' ? 2 : 50,
+        interpolator = d3.interpolateRgb('#4BA7EB', '#0023AD');
 
     return function(value) {
-        var x = (value - minAt) / (maxAt - minAt);
-        x = Math.max(0, Math.min(x, 1));
+        var x = Math.max(0, Math.min(value / maxAt, 1));
         return interpolator(x);
     };
 
@@ -652,7 +625,6 @@ function _getRainInterpolator(config) {
 function _getWindInterpolator(config) {
 
     var multiplier,
-        minAt = 0,
         strongAt = 50,
         maxAt = 100;
 
@@ -682,7 +654,7 @@ function _getWindInterpolator(config) {
 
         if (kmh < strongAt) {
             interpolatorName = 'light';
-            interpolatorMin = minAt;
+            interpolatorMin = 0;
             interpolatorMax = strongAt;
         } else {
             interpolatorName = 'strong';
@@ -696,7 +668,6 @@ function _getWindInterpolator(config) {
 
     };
 
- }
-
+}
 
 })();
