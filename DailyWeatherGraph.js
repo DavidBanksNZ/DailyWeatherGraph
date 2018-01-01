@@ -101,7 +101,7 @@ window.DailyWeatherGraph = function DailyWeatherGraph(cfg) {
 
     // The x scale. Make sure there is good spacing between points.
     var xScale = d3.scaleBand()
-        .domain(_pluck(config.data, 'Date'))
+        .domain(_mapVariable(config.data, 'Date'))
         .rangeRound([0, dim.plotAreaWidth], 0.25);
 
     _drawWindRegion(svg, xScale, config, dim, keyFunc);
@@ -126,7 +126,7 @@ window.DailyWeatherGraph = function DailyWeatherGraph(cfg) {
 
             var prevMonthDate = data[indexOfNewMonth - 1].Date,
                 currMonthDate = data[indexOfNewMonth].Date,
-                newMonthLineX = (xScale(prevMonthDate) + xScale(currMonthDate))/2 + xScale.bandwidth()/2;
+                newMonthLineX = (xScale(prevMonthDate) + xScale(currMonthDate)) / 2 + xScale.bandwidth() / 2;
 
             svg.append('line')
                 .attr('class', 'vertical-separator')
@@ -207,24 +207,24 @@ function _createWindIndicatorDefs(defs, dim) {
 
     // Use circle shape
     windSymbol.append('circle')
-        .attr('cx', dim.windSize/2)
-        .attr('cy', dim.windSize/2)
+        .attr('cx', dim.windSize / 2)
+        .attr('cy', dim.windSize / 2)
         .attr('stroke-width', '1.3px')
         .attr('r', dim.windCircleRadius);
 
     var indicator = defs.append('g')
         .attr('id', 'daily-weather-graph-wind-indicator');
 
-    var indicator_y0 = dim.windSize/2 - dim.windCircleRadius + 4;
+    var indicator_y0 = dim.windSize / 2 - dim.windCircleRadius + 4;
     var indicator_length = 8;
     var indicator_y1 = indicator_y0 - indicator_length;
-    var indicator_x0 = dim.windSize/2 - indicator_length/2;
-    var indicator_x1 = dim.windSize/2 + indicator_length/2;
+    var indicator_x0 = dim.windSize / 2 - indicator_length / 2;
+    var indicator_x1 = dim.windSize / 2 + indicator_length / 2;
 
     indicator.append('path')
         .attr('d', 'M' + indicator_x0 + ',' + indicator_y1 +
             ' L' + indicator_x1 + ',' + indicator_y1 +
-            ' L' + dim.windSize/2 + ',' + indicator_y0 +
+            ' L' + dim.windSize / 2 + ',' + indicator_y0 +
             ' L' + indicator_x0 + ',' + indicator_y1);
 
 }
@@ -234,13 +234,14 @@ function _createWindIndicatorDefs(defs, dim) {
 function _drawRainRegion(svg, xScale, config, dim, keyFunc) {
 
     var lowestRainScaleMax = 10;
-    var rainDecimals = (config.rainUnit == 'inches' ? 2 : 1);
+    var rainDecimals = (config.rainUnit === 'inches' ? 2 : 1);
 
-    if (config.rainUnit == 'inches')
+    if (config.rainUnit === 'inches') {
         lowestRainScaleMax = lowestRainScaleMax / 25.4;
+    }
 
     // Filter any NA values
-    var rainTotals = _pluck(config.data, 'Rainfall').filter(function(r) {
+    var rainTotals = _mapVariable(config.data, 'Rainfall').filter(function(r) {
         return r !== config.missingValue;
     });
 
@@ -257,9 +258,9 @@ function _drawRainRegion(svg, xScale, config, dim, keyFunc) {
     rainRegion.append('rect')
         .attr('class', 'rain-region-background')
         .attr('x', 0)
-        .attr('y', dim.plotAreaHeight - dim.rainRegionHeight - dim.regionSpacing/2)
+        .attr('y', dim.plotAreaHeight - dim.rainRegionHeight - dim.regionSpacing / 2)
         .attr('width', dim.plotAreaWidth)
-        .attr('height', dim.rainRegionHeight + dim.regionSpacing/2);
+        .attr('height', dim.rainRegionHeight + dim.regionSpacing / 2);
 
     var rainBars = rainRegion.append('g').attr('class', 'rain-bars'),
         rainLabels = rainRegion.append('g').attr('class', 'rain-labels');
@@ -307,7 +308,7 @@ function _drawRainRegion(svg, xScale, config, dim, keyFunc) {
                 'rain-label');
         })
         .attr('text-anchor', 'middle')
-        .attr('x', function(d) {return xScale(d.Date) + xScale.bandwidth()/2;})
+        .attr('x', function(d) {return xScale(d.Date) + xScale.bandwidth() / 2;})
         .attr('y', function(d) {
             var r = (d.Rainfall === config.missingValue ? 0 : d.Rainfall);
             return dim.plotAreaHeight - rainScale(r) - 8;
@@ -336,7 +337,7 @@ function _drawRainRegion(svg, xScale, config, dim, keyFunc) {
     rainRegion.append('text')
         .attr('class', 'section-label')
         .attr('x', 5)
-        .attr('y', dim.plotAreaHeight - dim.rainRegionHeight - dim.regionSpacing/2)
+        .attr('y', dim.plotAreaHeight - dim.rainRegionHeight - dim.regionSpacing / 2)
         .attr('dy', '1.3em')
         .text('Daily rainfall (' + config.rainfallUnit + ')');
 
@@ -344,7 +345,7 @@ function _drawRainRegion(svg, xScale, config, dim, keyFunc) {
     rainRegion.append('text')
         .attr('class', 'statistic-label')
         .attr('x', dim.plotAreaWidth - 5)
-        .attr('y', dim.plotAreaHeight - dim.rainRegionHeight - dim.regionSpacing/2)
+        .attr('y', dim.plotAreaHeight - dim.rainRegionHeight - dim.regionSpacing / 2)
         .attr('text-anchor', 'end')
         .attr('dy', '1.3em')
         .text('Total: ' + d3.sum(rainTotals).toFixed(rainDecimals));
@@ -352,8 +353,7 @@ function _drawRainRegion(svg, xScale, config, dim, keyFunc) {
     // Add line to separate rain region from temperature region
     rainRegion.append('line')
         .attr('class', 'region-separator')
-        .attr('transform', 'translate(0,' + (dim.plotAreaHeight -
-            dim.rainRegionHeight - dim.regionSpacing/2) + ')')
+        .attr('transform', 'translate(0,' + (dim.plotAreaHeight - dim.rainRegionHeight - dim.regionSpacing / 2) + ')')
         .attr('x1', 0)
         .attr('x2', dim.plotAreaWidth)
         .attr('y1', 0)
@@ -372,8 +372,8 @@ function _drawTemperatureRegion(svg, xScale, config, dim, keyFunc) {
                 dim.windRegionHeight + dim.regionSpacing]);
 
     // Calculate the range of the temperature data.
-    var highTemps = _pluck(config.data, 'HighTemperature');
-    var lowTemps = _pluck(config.data, 'LowTemperature');
+    var highTemps = _mapVariable(config.data, 'HighTemperature');
+    var lowTemps = _mapVariable(config.data, 'LowTemperature');
 
     var validTemps = highTemps.concat(lowTemps).filter(function(t) {
         return t !== config.missingValue;
@@ -392,11 +392,11 @@ function _drawTemperatureRegion(svg, xScale, config, dim, keyFunc) {
 
     // D3 line function for calculating temperature path coordinates
     var lowTemperatureLine = d3.line()
-        .x(function(d) { return xScale(d.Date) + xScale.bandwidth()/2; })
+        .x(function(d) { return xScale(d.Date) + xScale.bandwidth() / 2; })
         .y(function(d) { return tempScale(d.LowTemperature); });
 
     var highTemperatureLine = d3.line()
-        .x(function(d) { return xScale(d.Date) + xScale.bandwidth()/2; })
+        .x(function(d) { return xScale(d.Date) + xScale.bandwidth() / 2; })
         .y(function(d) { return tempScale(d.HighTemperature); });
 
     lowTemperatureLine.defined(function(d) {
@@ -412,7 +412,7 @@ function _drawTemperatureRegion(svg, xScale, config, dim, keyFunc) {
     tempRegion.append('rect')
         .attr('class', 'temperature-region-background')
         .attr('x', 0)
-        .attr('y', dim.windRegionHeight + dim.regionSpacing/2)
+        .attr('y', dim.windRegionHeight + dim.regionSpacing / 2)
         .attr('width', dim.plotAreaWidth)
         .attr('height', dim.tempRegionHeight + dim.regionSpacing);
 
@@ -435,7 +435,7 @@ function _drawTemperatureRegion(svg, xScale, config, dim, keyFunc) {
         .enter()
         .append('text')
         .attr('class', 'temperature-high-label')
-        .attr('x', function(d) { return xScale(d.Date) + xScale.bandwidth()/2; })
+        .attr('x', function(d) { return xScale(d.Date) + xScale.bandwidth() / 2; })
         .attr('y', function(d) { return tempScale(d.HighTemperature); })
         .attr('dy', '0.35em')
         .attr('text-anchor', 'middle')
@@ -450,7 +450,7 @@ function _drawTemperatureRegion(svg, xScale, config, dim, keyFunc) {
         .enter()
         .append('text')
         .attr('class', 'temperature-low-label')
-        .attr('x', function(d) { return xScale(d.Date) + xScale.bandwidth()/2; })
+        .attr('x', function(d) { return xScale(d.Date) + xScale.bandwidth() / 2; })
         .attr('y', function(d) { return tempScale(d.LowTemperature); })
         .attr('dy', '0.35em')
         .attr('text-anchor', 'middle')
@@ -461,7 +461,7 @@ function _drawTemperatureRegion(svg, xScale, config, dim, keyFunc) {
     // Draw the temperature region and wind region separator
     tempRegion.append('line')
         .attr('class', 'region-separator')
-        .attr('transform', 'translate(0,' + (dim.windRegionHeight + dim.regionSpacing/2) + ')')
+        .attr('transform', 'translate(0,' + (dim.windRegionHeight + dim.regionSpacing / 2) + ')')
         .attr('x1', 0)
         .attr('x2', dim.plotAreaWidth)
         .attr('y1', 0)
@@ -471,7 +471,7 @@ function _drawTemperatureRegion(svg, xScale, config, dim, keyFunc) {
     tempRegion.append('text')
         .attr('class', 'section-label')
         .attr('x', 5)
-        .attr('y', dim.windRegionHeight + dim.regionSpacing/2)
+        .attr('y', dim.windRegionHeight + dim.regionSpacing / 2)
         .attr('dy', '1.3em')
         .text('High and low temperatures (°' + config.temperatureUnit + ')');
 
@@ -494,7 +494,7 @@ function _drawWindRegion(svg, xScale, config, dim, keyFunc) {
         .attr('x', 0)
         .attr('y', 0)
         .attr('width', dim.plotAreaWidth)
-        .attr('height', dim.windRegionHeight + dim.regionSpacing/2);
+        .attr('height', dim.windRegionHeight + dim.regionSpacing / 2);
 
     var windIcons = windRegion.append('g').attr('class', 'wind-icons'),
         windArrows = windRegion.append('g').attr('class', 'wind-arrows'),
@@ -509,8 +509,8 @@ function _drawWindRegion(svg, xScale, config, dim, keyFunc) {
         .attr('transform', function(d) {
             if (d.HighWindGustBearing === config.missingValue)
                 return '';
-            var trans_x = (xScale(d.Date) + xScale.bandwidth()/2);
-            return 'translate(' + (trans_x - dim.windSize/2) + ',' + y + ')';
+            var trans_x = (xScale(d.Date) + xScale.bandwidth() / 2);
+            return 'translate(' + (trans_x - dim.windSize / 2) + ',' + y + ')';
         })
         .style('fill', function(d) {
             return (d.HighWindGust === config.missingValue ?
@@ -534,10 +534,10 @@ function _drawWindRegion(svg, xScale, config, dim, keyFunc) {
         .attr('transform', function(d) {
             if (d.HighWindGustBearing === config.missingValue)
                 return '';
-            var trans_x = (xScale(d.Date) + xScale.bandwidth()/2),
-                rotate = 45 * Math.round(d.HighWindGustBearing/45);
-            return 'translate(' + (trans_x - dim.windSize/2) + ',35) rotate(' +
-                rotate + ' ' + dim.windSize/2 + ' ' + dim.windSize/2 + ')';
+            var trans_x = (xScale(d.Date) + xScale.bandwidth() / 2),
+                rotate = 45 * Math.round(d.HighWindGustBearing / 45);
+            return 'translate(' + (trans_x - dim.windSize / 2) + ',35) rotate(' +
+                rotate + ' ' + dim.windSize / 2 + ' ' + dim.windSize / 2 + ')';
         })
         .style('fill', function(d) {
             return (d.HighWindGustBearing === config.missingValue || Math.round(d.HighWindGust) === 0 ?
@@ -560,8 +560,8 @@ function _drawWindRegion(svg, xScale, config, dim, keyFunc) {
                 'na-label' :
                 'wind-gust-label');
         })
-        .attr('x', function(d) { return xScale(d.Date) + xScale.bandwidth()/2; })
-        .attr('y', y + dim.windSize/2)
+        .attr('x', function(d) { return xScale(d.Date) + xScale.bandwidth() / 2; })
+        .attr('y', y + dim.windSize / 2)
         .attr('dy', '0.35em')
         .attr('text-anchor', 'middle')
         .text(function(d) {
@@ -575,7 +575,7 @@ function _drawWindRegion(svg, xScale, config, dim, keyFunc) {
         .enter()
         .append('text')
         .attr('class', 'wind-direction-label')
-        .attr('x', function(d) { return xScale(d.Date) + xScale.bandwidth()/2; })
+        .attr('x', function(d) { return xScale(d.Date) + xScale.bandwidth() / 2; })
         .attr('y', y)
         .attr('text-anchor', 'middle')
         .text(function(d) {
@@ -619,21 +619,15 @@ function _cloneShallow(obj) {
 
 }
 
-function _pluck(objects, prop) {
-
-    var values = [];
-
-    objects.forEach(function(o) {
-        values.push(o[prop]);
+function _mapVariable(objects, prop) {
+    return objects.map(function(obj) {
+        return obj[prop];
     });
-
-    return values;
-
 }
 
 function _getWindDirection(bearing) {
-	var directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'N'];
-	return directions[Math.round(bearing/45)];
+    var directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'N'];
+    return directions[Math.round(bearing / 45)];
 }
 
 function _getRainInterpolator(config) {
@@ -641,8 +635,9 @@ function _getRainInterpolator(config) {
     var maxAt = 50,
         minAt = 0;
 
-    if (config.rainUnit === 'inches')
-        maxAt = maxAt/25.4;
+    if (config.rainUnit === 'inches') {
+        maxAt = maxAt / 25.4;
+    }
 
     var interpolator = d3.interpolateRgb('#4BA7EB', '#0023AD');
 
@@ -663,10 +658,10 @@ function _getWindInterpolator(config) {
 
     switch (config.windUnit) {
         case 'knots':
-           multiplier = 1/0.54;
+           multiplier = 1 / 0.54;
            break;
         case 'mph':
-           multiplier = 1/0.62137;
+           multiplier = 1 / 0.62137;
            break;
         case 'm/s':
            multiplier = 3.6;
@@ -683,23 +678,21 @@ function _getWindInterpolator(config) {
     return function(value) {
 
         var kmh = value * multiplier;
-        var interpName;
-        var interpMin;
-        var interpMax;
+        var interpolatorName, interpolatorMin, interpolatorMax;
 
         if (kmh < strongAt) {
-            interpName = 'light';
-            interpMin = minAt;
-            interpMax = strongAt;
+            interpolatorName = 'light';
+            interpolatorMin = minAt;
+            interpolatorMax = strongAt;
         } else {
-            interpName = 'strong';
-            interpMin = strongAt;
-            interpMax = maxAt;
+            interpolatorName = 'strong';
+            interpolatorMin = strongAt;
+            interpolatorMax = maxAt;
         }
 
-        var x = (value - interpMin) / (interpMax - interpMin);
+        var x = (value - interpolatorMin) / (interpolatorMax - interpolatorMin);
         x = Math.max(0, Math.min(x, 1));
-        return interpolators[interpName](x);
+        return interpolators[interpolatorName](x);
 
     };
 
