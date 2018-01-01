@@ -2,6 +2,11 @@
   "name": "daily-weather-graph-d3",
   "version": "1.0.0",
   "description": "Library for creating a daily weather chart using D3",
+  "keywords": [
+    "d3",
+    "weather",
+    "graph"
+  ],
   "main": "DailyWeatherGraph.js",
   "scripts": {
     "uglify": "uglifyjs daily-weather-graph.js --compress --mangle --output daily-weather-graph.min.js"
