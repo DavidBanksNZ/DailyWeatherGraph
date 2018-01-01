@@ -97,7 +97,9 @@ window.DailyWeatherGraph = function DailyWeatherGraph(cfg) {
     // The x scale. Make sure there is good spacing between points.
     var xScale = d3.scaleBand()
         .domain(_mapVariable(config.data, 'Date'))
-        .rangeRound([0, dim.plotAreaWidth], 0.25);
+        .rangeRound([0, dim.plotAreaWidth])
+        .paddingInner(0.25)
+        .paddingOuter(0);
 
     _drawWindRegion(svg, xScale, config, dim, keyFunc);
     _drawTemperatureRegion(svg, xScale, config, dim, keyFunc);
@@ -141,7 +143,6 @@ window.DailyWeatherGraph = function DailyWeatherGraph(cfg) {
         .attr('x2', 0)
         .attr('y1', dim.marginTop)
         .attr('y2', dim.plotAreaHeight)
-        .attr('id', 'graph-cursor')
         .style('stroke', '#BBB')
         .style('stroke-width', '1px')
         .style('stroke-opacity', 0);
@@ -149,16 +150,16 @@ window.DailyWeatherGraph = function DailyWeatherGraph(cfg) {
     // Create the x axis, with no ticks showing.
     var xAxis = d3.axisBottom()
         .scale(xScale)
-        .tickSizeOuter(0)
         .tickSizeInner(0)
+        .tickSizeOuter(0.5) // seems to be a D3 bug, need to set to 0.5 to get no tick at the left side of the axis
         .tickFormat(function(date) {
-            var dateParts = date.split('-');
-            return parseInt(dateParts[2], 10);
+            return parseInt(date.substr(-2), 10);
         });
 
     // Draw the x axis and labels
+    // Draw the x axis and labels
     svg.append('g')
-        .attr('class', _className('axis', 'x-axis'))
+        .attr('class', _className('axis') + ' ' + _className('x-axis'))
         .attr('transform', 'translate(0,' + dim.plotAreaHeight + ')')
         .call(xAxis)
         .selectAll('text')
@@ -292,8 +293,8 @@ function _drawRainRegion(svg, xScale, config, dim, keyFunc) {
         .append('text')
         .attr('class', function(d) {
             return (d.Rainfall === config.missingValue ?
-				_className('missing-label') :
-				_className('rain-label'));
+                _className('missing-label') :
+                _className('rain-label'));
         })
         .attr('text-anchor', 'middle')
         .attr('x', function(d) {return xScale(d.Date) + xScale.bandwidth() / 2;})
@@ -541,8 +542,8 @@ function _drawWindRegion(svg, xScale, config, dim, keyFunc) {
         .append('text')
         .attr('class', function(d) {
             return (d.HighWindGust === config.missingValue ?
-				_className('na-label') :
-				_className('wind-gust-label'));
+                _className('na-label') :
+                _className('wind-gust-label'));
         })
         .attr('x', function(d) { return xScale(d.Date) + xScale.bandwidth() / 2; })
         .attr('y', y + dim.windSize / 2)
