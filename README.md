@@ -3,7 +3,7 @@
 This is a script (and associated CSS styles) for creating an SVG graph of daily weather observations.
 Plots daily rainfall totals, low and high temperatures, and daily high wind gusts and their directions. Written with the D3.js library version 4.
 
-![Example image](example.png)
+<img alt="example image" src="example.png" width="880">
 
 You create a new graph like this, where `config` is a configuration object:
 ```javascript
