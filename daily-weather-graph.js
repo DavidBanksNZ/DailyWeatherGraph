@@ -218,8 +218,8 @@ function _createWindIndicatorDefs(defs, dim) {
 
 function _drawRainRegion(svg, xScale, config, dim, keyFunc) {
 
-    var lowestRainScaleMax = config.rainUnit === 'inches' ? 0.4 : 10,
-        rainDecimals = (config.rainUnit === 'inches' ? 2 : 1);
+    var lowestRainScaleMax = config.rainfallUnit === 'inches' ? 0.4 : 10,
+        rainDecimals = (config.rainfallUnit === 'inches' ? 2 : 1);
 
     // Filter any NA values
     var rainTotals = _mapVariable(config.data, 'rainfall').filter(function(r) {

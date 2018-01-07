@@ -1,3 +1,7 @@
+# 2.0.4
+
+- Fix bug where using `inches` for `rainfallUnit` would not set up the scale correctly.
+
 # 2.0.3
 
 - Remove remaining hardcoded styles from js, create css classes instead
