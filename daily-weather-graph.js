@@ -46,9 +46,7 @@ window.DailyWeatherGraph = function DailyWeatherGraph(cfg) {
     dim.plotAreaWidth = config.width - dim.marginLeft - dim.marginRight;
     dim.plotAreaHeight = config.height - dim.marginTop - dim.marginBottom;
 
-    var remainingHeight = (config.height - dim.marginTop -
-        dim.marginBottom - 2 * dim.regionSpacing -
-        dim.windRegionHeight);
+    var remainingHeight = (config.height - dim.marginTop - dim.marginBottom - 2 * dim.regionSpacing - dim.windRegionHeight);
 
     dim.rainRegionHeight = remainingHeight * dim.rainRegionHeightProp;
     dim.tempRegionHeight = remainingHeight * dim.tempRegionHeightProp;
@@ -140,13 +138,11 @@ window.DailyWeatherGraph = function DailyWeatherGraph(cfg) {
 
     // Draw cursor (vertical guideline when mousing over)
     var cursor = svg.append('line')
+        .attr('class', _className('cursor'))
         .attr('x1', 0)
         .attr('x2', 0)
         .attr('y1', dim.marginTop)
-        .attr('y2', dim.plotAreaHeight)
-        .style('stroke', '#BBB')
-        .style('stroke-width', '1px')
-        .style('stroke-opacity', 0);
+        .attr('y2', dim.plotAreaHeight);
 
     // Create the x axis, with no ticks showing.
     var xAxis = d3.axisBottom()
@@ -158,27 +154,21 @@ window.DailyWeatherGraph = function DailyWeatherGraph(cfg) {
         });
 
     // Draw the x axis and labels
-    // Draw the x axis and labels
     svg.append('g')
         .attr('class', _className('axis') + ' ' + _className('x-axis'))
         .attr('transform', 'translate(0,' + dim.plotAreaHeight + ')')
         .call(xAxis)
         .selectAll('text')
-        .attr('dy', '1.4em')
-        .style('font-size', '11px');
+        .attr('dy', '1.4em');
 
     plotArea.on('mousemove', function() {
 
         // On mousemove, move the graph cursor to follow the mouse pointer
         var pos = d3.mouse(svgEl.node());
-        var pt = svgEl.node().createSVGPoint();
-        pt.x = pos[0];
-        pt.y = pos[1];
+        var x = pos[0] - dim.marginLeft;
 
-        var point = pt.matrixTransform(svgEl.node().getScreenCTM().inverse());
-
-        cursor.attr('x1', point.x);
-        cursor.attr('x2', point.x);
+        cursor.attr('x1', x)
+            .attr('x2', x);
 
     });
 
@@ -293,18 +283,21 @@ function _drawRainRegion(svg, xScale, config, dim, keyFunc) {
         .enter()
         .append('text')
         .attr('class', function(d) {
-            return (d.rainfall === config.missingValue ?
-                _className('missing-label') :
-                _className('rain-label'));
+            var className;
+            if (d.rainfall === 0) {
+                className = 'rain-zero-dot';
+            } else if (d.rainfall === config.missingValue) {
+                className = 'missing-label';
+            } else {
+                className = 'rain-label';
+            }
+            return _className(className);
         })
         .attr('text-anchor', 'middle')
         .attr('x', function(d) {return xScale(d.date) + xScale.bandwidth() / 2;})
         .attr('y', function(d) {
             var r = (d.rainfall === config.missingValue ? 0 : d.rainfall);
             return dim.plotAreaHeight - rainScale(r) - 8;
-        })
-        .style('font-size', function(d) {
-            return d.rainfall === 0 ? '15px' : '';
         })
         .text(function(d) {
             if (d.rainfall > 0) {
@@ -383,7 +376,7 @@ function _drawTemperatureRegion(svg, xScale, config, dim, keyFunc) {
 
     var highTemperatureLine = d3.line()
         .x(function(d) { return xScale(d.date) + xScale.bandwidth() / 2; })
-        .y(function(d) { return tempScale(d.highTemperature); });
+        .y(function(d) { return tempScale(Math.round(d.highTemperature)); });
 
     lowTemperatureLine.defined(function(d) {
         return d.lowTemperature !== config.missingValue;
@@ -426,7 +419,7 @@ function _drawTemperatureRegion(svg, xScale, config, dim, keyFunc) {
         .attr('dy', '0.35em')
         .attr('text-anchor', 'middle')
         .text(function(d) {
-            return (d.highTemperature === config.missingValue ? '' : d.highTemperature);
+            return (d.highTemperature === config.missingValue ? '' : Math.round(d.highTemperature));
         });
 
     // Draw the low temperature labels
@@ -441,7 +434,7 @@ function _drawTemperatureRegion(svg, xScale, config, dim, keyFunc) {
         .attr('dy', '0.35em')
         .attr('text-anchor', 'middle')
         .text(function(d) {
-            return (d.lowTemperature === config.missingValue ? '' : d.lowTemperature);
+            return (d.lowTemperature === config.missingValue ? '' : Math.round(d.lowTemperature));
         });
 
     // Draw the temperature region and wind region separator
@@ -526,14 +519,10 @@ function _drawWindRegion(svg, xScale, config, dim, keyFunc) {
                 rotate + ' ' + dim.windSize / 2 + ' ' + dim.windSize / 2 + ')';
         })
         .style('fill', function(d) {
-            return (d.highWindGustBearing === config.missingValue || Math.round(d.highWindGust) === 0 ?
-                'none' :
-                '#000000');
+            return (d.highWindGustBearing === config.missingValue || Math.round(d.highWindGust) === 0 ? 'none' : '#000000');
         })
         .style('stroke', function(d) {
-            return (d.highWindGustBearing === config.missingValue || Math.round(d.highWindGust) === 0 ?
-                'none' :
-                '#FFFFFF');
+            return (d.highWindGustBearing === config.missingValue || Math.round(d.highWindGust) === 0 ? 'none' : '#FFFFFF');
         });
 
     // Draw the labels for wind direction and speed
@@ -542,18 +531,14 @@ function _drawWindRegion(svg, xScale, config, dim, keyFunc) {
         .enter()
         .append('text')
         .attr('class', function(d) {
-            return (d.highWindGust === config.missingValue ?
-                _className('na-label') :
-                _className('wind-gust-label'));
+            return (d.highWindGust === config.missingValue ? _className('na-label') : _className('wind-gust-label'));
         })
         .attr('x', function(d) { return xScale(d.date) + xScale.bandwidth() / 2; })
         .attr('y', y + dim.windSize / 2)
         .attr('dy', '0.35em')
         .attr('text-anchor', 'middle')
         .text(function(d) {
-            return (d.highWindGust === config.missingValue ?
-                config.missingValueText :
-                Math.round(d.highWindGust));
+            return (d.highWindGust === config.missingValue ? config.missingValueText : Math.round(d.highWindGust));
         });
 
     windDirLabels.selectAll('text.wind-direction-label')
@@ -565,9 +550,7 @@ function _drawWindRegion(svg, xScale, config, dim, keyFunc) {
         .attr('y', y)
         .attr('text-anchor', 'middle')
         .text(function(d) {
-            return (d.highWindGustBearing === config.missingValue || Math.round(d.highWindGust) === 0 ?
-                '' :
-                _getWindDirection(d.highWindGustBearing));
+            return (d.highWindGustBearing === config.missingValue || Math.round(d.highWindGust) === 0 ? '' : _getWindDirection(d.highWindGustBearing));
         });
 
     // Draw wind label in top left of wind region
@@ -597,8 +580,9 @@ function _cloneShallow(obj) {
     var clone = {};
 
     for (var prop in obj) {
-        if (_hasOwn(obj, prop))
+        if (_hasOwn(obj, prop)) {
             clone[prop] = obj[prop];
+        }
     }
 
     return clone;

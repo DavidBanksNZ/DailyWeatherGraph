@@ -42,6 +42,9 @@
 .dwg-rain-label {
     font-size: 11px;
 }
+.dwg-rain-zero-dot {
+    font-size: 15px;
+}
 
 .dwg-wind-gust-label {
     fill: #FFFFFF;
@@ -66,4 +69,10 @@
 }
 .dwg-temperature-high-label {
     fill: rgb(250, 0, 0);
+}
+
+.dwg-cursor {
+    stroke: #BBB;
+    stroke-width: 1px;
+    stroke-opacity: 0;
 }

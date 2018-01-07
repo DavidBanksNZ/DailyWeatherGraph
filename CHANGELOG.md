@@ -1,3 +1,9 @@
+# 2.0.3
+
+- Remove remaining hardcoded styles from js, create css classes instead
+- Fix cursor positioning bug
+- Make sure temperature values are rounded before being used
+
 # 2.0.2
 
 - Fix code bug
