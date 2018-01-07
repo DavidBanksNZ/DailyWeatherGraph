@@ -122,8 +122,8 @@ window.DailyWeatherGraph = function DailyWeatherGraph(cfg) {
 
         if (indexOfNewMonth < numPoints && indexOfNewMonth > 0) {
 
-            var prevMonthDate = data[indexOfNewMonth - 1].date,
-                currMonthDate = data[indexOfNewMonth].date,
+            var prevMonthDate = config.data[indexOfNewMonth - 1].date,
+                currMonthDate = config.data[indexOfNewMonth].date,
                 newMonthLineX = (xScale(prevMonthDate) + xScale(currMonthDate)) / 2 + xScale.bandwidth() / 2;
 
             svg.append('line')

@@ -1,3 +1,7 @@
+# 2.0.2
+
+- Fix code bug
+
 # 2.0.1
 
 - Fix incorrect typings
