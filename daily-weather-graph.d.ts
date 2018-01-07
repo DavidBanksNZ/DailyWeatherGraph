@@ -4,7 +4,7 @@ declare class DailyWeatherGraph {
 
 declare interface IDailyWeatherGraphConfig {
 	container: HTMLElement;
-	data: IDailyWeatherGraphData;
+	data: IDailyWeatherGraphData[];
 	width?: number;
 	height?: number;
 	dateFormat?: string;

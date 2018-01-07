@@ -1,3 +1,7 @@
+# 2.0.1
+
+- Fix incorrect typings
+
 # 2.0.0
 
 - Make data object keys lowerCamelCase, not UpperCamelCase
